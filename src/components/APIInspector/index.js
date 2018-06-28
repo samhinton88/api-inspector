@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './style.css';
 import axios from 'axios';
+import KeyButton from '../KeyButton';
 
 function getAtLookup(lookup, object) {
   let candidate = object;
@@ -23,6 +24,7 @@ class APIInspector extends Component {
     response: "",
     lookup: null,
     history: [],
+    errors: null,
     mapperFunc: null
   }
 
@@ -36,7 +38,8 @@ class APIInspector extends Component {
   fetch = async (uri) => {
     const { mapperFunc } = this.state;
 
-    const res = await axios.get(uri);
+    const res = await axios.get(uri)
+      .catch((errors) => this.setState({errors}));
 
     console.log('raw response', res)
 
@@ -60,6 +63,14 @@ class APIInspector extends Component {
     this.setState({response, history: [...this.state.history, {uri, lookup}]});
   }
 
+  renderKeyButtons = () => {
+    const { keys } = this.state.response;
+
+    if(!keys) { return }
+
+    return keys.map((k) =>  <KeyButton data={k} />)
+  }
+
   render() {
     console.log(this.state)
 
@@ -79,10 +90,14 @@ class APIInspector extends Component {
 
           <div className='response-inspector-container'>
             <div className='response-inspector'>
-              <div className='response-inspector-key-container'>
 
+              <div className='response-inspector-key-container'>
+                {this.renderKeyButtons()}
               </div>
-              {this.state.response ? JSON.stringify(this.state.response.keys) : ''}
+              <div className='response-inspector-body-container'>
+                {this.state.response ? JSON.stringify(this.state.response.data) : ''}
+                {this.state.errors ? JSON.stringify(this.state.errors) : ''}
+              </div>
             </div>
           </div>
         </div>

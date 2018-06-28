@@ -55,9 +55,25 @@
   background: white;
 }
 
+.response-inspector h6 {
+  margin: none;
+}
+
 
 .api-inspector-history-section {
   width: 400px;
   height: 600px;
   background: grey;
+}
+
+.response-inspector-key-container {
+
+  height: 40px;
+  padding: 5px;
+  display: flex;
+}
+
+.response-inspector-body-container {
+  height: 80%;
+  overflow-y: auto;
 }
