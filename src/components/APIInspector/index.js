@@ -65,24 +65,29 @@ class APIInspector extends Component {
 
     return (
       <div className='api-inspector'>
-        <div className='api-inspector-form-container'>
-          <h2>URI Inspector</h2>
-          <form className='api-inspector-form' onSubmit={this.handleSubmit}>
-            <input placeholder='uri' onChange={(e) => this.setState({value: e.target.value}) }/>
-            <input placeholder='lookup' onChange={(e) => this.setState({lookup: e.target.value}) }/>
-            <input placeholder='if array is found, run this map' onChange={(e) => this.setState({mapperFunc: e.target.value}) }/>
-            <button type='submit' >Fetch</button>
-          </form>
+        <div className='api-inspector-form-section'>
+          <div className='api-inspector-form-container'>
+            <h2>URI Inspector</h2>
+            <form className='api-inspector-form' onSubmit={this.handleSubmit}>
+              <input placeholder='uri' onChange={(e) => this.setState({value: e.target.value}) }/>
+              <input placeholder='lookup' onChange={(e) => this.setState({lookup: e.target.value}) }/>
+              <input placeholder='if array is found, run this map' onChange={(e) => this.setState({mapperFunc: e.target.value}) }/>
+              <button type='submit' >Fetch</button>
+            </form>
 
-        </div>
-
-        <div className='response-inspector-container'>
-          <div className='response-inspector'>
-            <div className='response-inspector-key-container'>
-
-            </div>
-            {this.state.response ? JSON.stringify(this.state.response.keys) : ''}
           </div>
+
+          <div className='response-inspector-container'>
+            <div className='response-inspector'>
+              <div className='response-inspector-key-container'>
+
+              </div>
+              {this.state.response ? JSON.stringify(this.state.response.keys) : ''}
+            </div>
+          </div>
+        </div>
+        <div className='api-inspector-history-section'>
+
         </div>
       </div>
     )
