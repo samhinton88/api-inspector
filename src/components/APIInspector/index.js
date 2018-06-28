@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './style.css';
 import axios from 'axios';
 import KeyButton from '../KeyButton';
+import HistoryItem from '../HistoryItem';
 
 function getAtLookup(lookup, object) {
   let candidate = object;
@@ -22,40 +23,44 @@ class APIInspector extends Component {
   state = {
     value: '',
     response: "",
-    lookup: null,
+    lookup: '',
     history: [],
     errors: null,
-    mapperFunc: null
+    mapperFunc: ''
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const {value, lookup, mapperFunc } = this.state;
 
-    this.fetch(this.state.value);
-    this.setState({value: ''});
+    this.fetch(value, lookup, mapperFunc);
+    this.setState({value: '', lookup: '', mapperFunc:''});
   }
 
-  fetch = async (uri) => {
-    const { mapperFunc } = this.state;
+  fetch = async (uri, lookup, mapperFunc) => {
+
 
     const res = await axios.get(uri)
       .catch((errors) => this.setState({errors}));
 
     console.log('raw response', res)
 
-    const lookup  = this.state.lookup
-      ? this.state.lookup.split('.')
+    const lkup  = lookup
+      ? lookup.split('.')
       : [];
-    console.log('full lookup as array before process', lookup)
-    const data = getAtLookup(lookup, res)
+    console.log('full lookup as array before process', lkup)
+    const data = getAtLookup(lkup, res)
+    let keys;
 
     if (Array.isArray(data)) {
-
+      keys = ['Array'];
+    } else {
+      keys = data ? Object.keys(data) : undefined
     }
 
     const response = {
       data,
-      keys: data ? Object.keys(data) : undefined
+      keys
     };
 
     console.log('response after lookup', response)
@@ -71,6 +76,12 @@ class APIInspector extends Component {
     return keys.map((k) =>  <KeyButton data={k} />)
   }
 
+  renderHistory = () => {
+    const { history } = this.state;
+
+    return history.map((h) => <HistoryItem data={h} />)
+  }
+
   render() {
     console.log(this.state)
 
@@ -80,9 +91,21 @@ class APIInspector extends Component {
           <div className='api-inspector-form-container'>
             <h2>URI Inspector</h2>
             <form className='api-inspector-form' onSubmit={this.handleSubmit}>
-              <input placeholder='uri' onChange={(e) => this.setState({value: e.target.value}) }/>
-              <input placeholder='lookup' onChange={(e) => this.setState({lookup: e.target.value}) }/>
-              <input placeholder='if array is found, run this map' onChange={(e) => this.setState({mapperFunc: e.target.value}) }/>
+              <input
+                placeholder='uri'
+                value={this.state.value}
+                onChange={(e) => this.setState({value: e.target.value}) }
+              />
+              <input
+                placeholder='lookup'
+                value={this.state.lookup}
+                onChange={(e) => this.setState({lookup: e.target.value}) }
+              />
+              <input
+                placeholder='if array is found, run this map'
+                value={this.state.mapperFunc}
+                onChange={(e) => this.setState({mapperFunc: e.target.value}) }
+              />
               <button type='submit' >Fetch</button>
             </form>
 
@@ -102,7 +125,7 @@ class APIInspector extends Component {
           </div>
         </div>
         <div className='api-inspector-history-section'>
-
+          {this.renderHistory()}
         </div>
       </div>
     )
