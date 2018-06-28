@@ -10,4 +10,11 @@
   margin-right: 2px;
   margin-left: 2px;
   border-radius: 3px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+
+.key-button:hover {
+  background: rgba(10, 200, 10, 1);
+  color: white;
 }

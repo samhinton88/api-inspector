@@ -26,7 +26,7 @@
 .api-inspector-form button {
   height: 30px;
   margin-top: 5px;
-  background: linear-gradient(90deg, rgba(10, 200, 10, 1), pink, rgba(10, 200, 10, 1));
+  background: linear-gradient(90deg, rgba(48, 205, 201, 1), pink, rgba(48, 205, 201, 1));
   background-size: 200% auto;
   transition: 1s;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
@@ -63,7 +63,20 @@
 .api-inspector-history-section {
   width: 600px;
   height: 600px;
-  background: grey;
+  background: rgba(250, 250, 250, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.api-inspector-history-section-header {
+  color: rgba(48, 205, 201, 1);
+}
+
+.api-inspector-history-section-body {
+  background: white;
+  width: 80%;
+  height: 80%;
 }
 
 .response-inspector-key-container {

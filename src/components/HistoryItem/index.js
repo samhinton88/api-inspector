@@ -4,11 +4,11 @@ import './style.css';
 class HistoryItem extends Component {
 
   render() {
-    const { data } = this.props;
+    const { data: { uri, lookup }, style } = this.props;
 
     return(
-      <div className='history-item'>
-        {JSON.stringify(data)}
+      <div className='history-item' style={style}>
+        <div className='verb-type'>GET</div>{uri || 'empty'}
       </div>
     )
   }

@@ -79,7 +79,12 @@ class APIInspector extends Component {
   renderHistory = () => {
     const { history } = this.state;
 
-    return history.map((h) => <HistoryItem data={h} />)
+    return history.reverse().map((h, i) => {
+      const fade = i  / 10;
+      console.log(fade)
+
+      return <HistoryItem data={h} style={{background: `rgba(48, 205, 201, ${1 - fade})`}}/>
+    })
   }
 
   render() {
@@ -125,7 +130,12 @@ class APIInspector extends Component {
           </div>
         </div>
         <div className='api-inspector-history-section'>
-          {this.renderHistory()}
+          <div className='api-inspector-history-section-header'>
+            <h2>History</h2>
+          </div>
+          <div className='api-inspector-history-section-body'>
+            {this.renderHistory()}
+          </div>
         </div>
       </div>
     )
