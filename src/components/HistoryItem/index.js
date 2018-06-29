@@ -4,10 +4,10 @@ import './style.css';
 class HistoryItem extends Component {
 
   render() {
-    const { data: { uri, lookup }, style } = this.props;
+    const { data: { uri, lookup }, style, onClick } = this.props;
 
     return(
-      <div className='history-item' style={style}>
+      <div className='history-item' style={style} >
         <div className='verb-type'>GET</div>{uri || 'empty'}
       </div>
     )

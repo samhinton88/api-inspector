@@ -5,6 +5,7 @@ import KeyButton from '../KeyButton';
 import HistoryItem from '../HistoryItem';
 
 function getAtLookup(lookup, object) {
+  console.log('lookup', lookup)
   let candidate = object;
 
   for (let i=0; i<lookup.length; i++) {
@@ -23,7 +24,10 @@ class APIInspector extends Component {
   state = {
     value: '',
     response: "",
-    lookup: '',
+    lookupVal: '',
+    lookup: [],
+    arrAtLookup: null,
+    arrIndex: 0,
     history: [],
     errors: null,
     mapperFunc: ''
@@ -31,55 +35,75 @@ class APIInspector extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    const {value, lookup, mapperFunc } = this.state;
+    const {value, lookupVal, mapperFunc } = this.state;
 
+    const lookup = lookupVal.split('.');
     this.fetch(value, lookup, mapperFunc);
-    this.setState({value: '', lookup: '', mapperFunc:''});
+    this.setState({value: '', mapperFunc:'', lookupVal: ''});
   }
 
   fetch = async (uri, lookup, mapperFunc) => {
 
-
     const res = await axios.get(uri)
       .catch((errors) => this.setState({errors}));
 
-    console.log('raw response', res)
+    const responseObj = res;
 
-    const lkup  = lookup
-      ? lookup.split('.')
-      : [];
-    console.log('full lookup as array before process', lkup)
-    const data = getAtLookup(lkup, res)
-    let keys;
+    this.setState({responseObj, history: [{uri, lookup}, ...this.state.history ]});
+  }
 
-    if (Array.isArray(data)) {
-      keys = ['Array'];
-    } else {
-      keys = data ? Object.keys(data) : undefined
-    }
+  renderResponseAtLookup = () => {
+    if (!this.state.responseObj) { return }
+    const { responseObj, lookup } = this.state;
 
-    const response = {
-      data,
-      keys
-    };
+    const responseAtLookup = getAtLookup(lookup, responseObj);
 
-    console.log('response after lookup', response)
+    if (!responseAtLookup) { return 'undefined'}
 
-    this.setState({response, history: [...this.state.history, {uri, lookup}]});
+    return JSON.stringify(responseAtLookup);
   }
 
   renderKeyButtons = () => {
-    const { keys } = this.state.response;
+    const { responseObj, lookup, arrIndex } = this.state;
 
-    if(!keys) { return }
+    const l = lookup.length;
 
-    return keys.map((k) =>  <KeyButton data={k} />)
+    if(!responseObj) { return }
+
+    const objectAtLookup = getAtLookup(lookup, responseObj)
+
+    if(Array.isArray(objectAtLookup)) {
+      return (
+        <KeyButton
+          isArray
+          onForward={() => this.setState({arrIndex: arrIndex + 1})}
+          onBack={() => this.setState({arrIndex: arrIndex - 1})}
+        />
+      )
+    }
+
+    return Object.keys(objectAtLookup).map((k) => {
+      return (
+        <KeyButton
+          data={k}
+          onClick={() => this.setState({ lookup: [...this.state.lookup, k] })}
+        />
+      )
+    })
+  }
+
+  renderArrayHoverNav = () => {
+    const { arrAtLookup } = this.state;
+
+    if(!arrAtLookup) { return }
+
+    return
   }
 
   renderHistory = () => {
     const { history } = this.state;
 
-    return history.reverse().map((h, i) => {
+    return history.map((h, i) => {
       const fade = i  / 10;
       console.log(fade)
 
@@ -88,7 +112,8 @@ class APIInspector extends Component {
   }
 
   render() {
-    console.log(this.state)
+    const { lookup } = this.state;
+    const lkupln = lookup.length
 
     return (
       <div className='api-inspector'>
@@ -104,7 +129,7 @@ class APIInspector extends Component {
               <input
                 placeholder='lookup'
                 value={this.state.lookup}
-                onChange={(e) => this.setState({lookup: e.target.value}) }
+                onChange={(e) => this.setState({lookupVal: e.target.value.split('.')}) }
               />
               <input
                 placeholder='if array is found, run this map'
@@ -120,10 +145,12 @@ class APIInspector extends Component {
             <div className='response-inspector'>
 
               <div className='response-inspector-key-container'>
+                {lkupln > 0 ? <button onClick={() => this.setState({lookup: lookup.slice(0, lkupln-1)})}>^</button> : ''}
                 {this.renderKeyButtons()}
+                {this.renderArrayHoverNav()}
               </div>
               <div className='response-inspector-body-container'>
-                {this.state.response ? JSON.stringify(this.state.response.data) : ''}
+                {this.renderResponseAtLookup()}
                 {this.state.errors ? JSON.stringify(this.state.errors) : ''}
               </div>
             </div>
