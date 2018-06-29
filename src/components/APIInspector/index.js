@@ -3,18 +3,17 @@ import './style.css';
 import axios from 'axios';
 import KeyButton from '../KeyButton';
 import HistoryItem from '../HistoryItem';
+import ArrayHoverNav from '../ArrayHoverNav';
 
 function getAtLookup(lookup, object) {
-  console.log('lookup', lookup)
+
   let candidate = object;
 
   for (let i=0; i<lookup.length; i++) {
-    console.log('checking lookup', lookup[i])
 
 
     candidate = candidate[lookup[i]]
 
-    console.log('found', candidate)
   }
 
   return candidate;
@@ -26,10 +25,11 @@ class APIInspector extends Component {
     response: "",
     lookupVal: '',
     lookup: [],
-    arrAtLookup: null,
+    arrAtLookup: true,
     arrIndex: 0,
     history: [],
     errors: null,
+    perceivedArrPos: null,
     mapperFunc: ''
   }
 
@@ -59,6 +59,13 @@ class APIInspector extends Component {
     const responseAtLookup = getAtLookup(lookup, responseObj);
 
     if (!responseAtLookup) { return 'undefined'}
+
+    if(Array.isArray(responseAtLookup)) {
+      const pos = this.calcPerceivedArrPos(responseAtLookup.length)
+      console.log('pos', pos)
+      console.log(responseAtLookup)
+      return JSON.stringify(responseAtLookup[pos])
+    }
 
     return JSON.stringify(responseAtLookup);
   }
@@ -92,12 +99,23 @@ class APIInspector extends Component {
     })
   }
 
+  calcPerceivedArrPos = (length) => {
+    console.log(length)
+    const { arrPercentagePos } = this.state;
+    console.log('arrPercentagePos', arrPercentagePos)
+    const segSize = 100 / length;
+    console.log('segSize', segSize)
+    const perceivedArrPos = Math.floor(arrPercentagePos / segSize);
+    console.log('perceivedArrPos', perceivedArrPos)
+    return perceivedArrPos;
+  }
+
   renderArrayHoverNav = () => {
     const { arrAtLookup } = this.state;
 
     if(!arrAtLookup) { return }
 
-    return
+    return <ArrayHoverNav cb={(p) => this.setState({arrPercentagePos: p})}/>
   }
 
   renderHistory = () => {
@@ -105,14 +123,14 @@ class APIInspector extends Component {
 
     return history.map((h, i) => {
       const fade = i  / 10;
-      console.log(fade)
 
       return <HistoryItem data={h} style={{background: `rgba(48, 205, 201, ${1 - fade})`}}/>
     })
   }
 
   render() {
-    const { lookup } = this.state;
+    const { lookup, arrPercentagePos } = this.state;
+
     const lkupln = lookup.length
 
     return (
