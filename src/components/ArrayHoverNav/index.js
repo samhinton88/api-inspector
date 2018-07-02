@@ -21,7 +21,7 @@ class ArrayHoverNav extends Component {
 
     if (!arrayNavRef.current) { return }
 
-    const { x, y, width } = arrayNavRef.current.getBoundingClientRect();
+    const { x, width } = arrayNavRef.current.getBoundingClientRect();
 
     const xpos = mouseX -  x;
 
@@ -30,20 +30,19 @@ class ArrayHoverNav extends Component {
     return percentagePos;
   }
 
-  calcPerceivedArrPos = () => {
-
-  }
 
   handleMouseMove = (e) => {
     const { cb } = this.props;
 
+    const percentagePos = this.renderPercentage();
+
     this.setState(
             {
               mouseX: e.clientX,
-              percentagePos: this.renderPercentage()
+              percentagePos
             })
 
-    cb(this.renderPercentage())
+    cb(percentagePos)
   }
 
   render() {

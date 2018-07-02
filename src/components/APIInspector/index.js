@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import './style.css';
 import axios from 'axios';
 import KeyButton from '../KeyButton';
+
 import HistoryItem from '../HistoryItem';
 import ArrayHoverNav from '../ArrayHoverNav';
+import EndPointModel from '../EndPointModel';
 
 function getAtLookup(lookup, object) {
 
   let candidate = object;
 
   for (let i=0; i<lookup.length; i++) {
-
 
     candidate = candidate[lookup[i]]
 
@@ -29,8 +30,8 @@ class APIInspector extends Component {
     arrIndex: 0,
     history: [],
     errors: null,
-    perceivedArrPos: null,
-    mapperFunc: ''
+    perceivedArrPos: 0,
+    responseObj: {}
   }
 
   handleSubmit = (e) => {
@@ -38,14 +39,14 @@ class APIInspector extends Component {
     const {value, lookupVal, mapperFunc } = this.state;
 
     const lookup = lookupVal.split('.');
+    this.setState({value: '', mapperFunc:'', lookupVal: '', errors: '', lookup:[]});
     this.fetch(value, lookup, mapperFunc);
-    this.setState({value: '', mapperFunc:'', lookupVal: ''});
   }
 
   fetch = async (uri, lookup, mapperFunc) => {
 
     const res = await axios.get(uri)
-      .catch((errors) => this.setState({errors}));
+        .catch((errors) => this.setState({errors}));
 
     const responseObj = res;
 
@@ -54,39 +55,58 @@ class APIInspector extends Component {
 
   renderResponseAtLookup = () => {
     if (!this.state.responseObj) { return }
-    const { responseObj, lookup } = this.state;
+    const { responseObj, lookup, perceivedArrPos } = this.state;
 
     const responseAtLookup = getAtLookup(lookup, responseObj);
 
     if (!responseAtLookup) { return 'undefined'}
 
     if(Array.isArray(responseAtLookup)) {
+
       const pos = this.calcPerceivedArrPos(responseAtLookup.length)
-      console.log('pos', pos)
-      console.log(responseAtLookup)
-      return JSON.stringify(responseAtLookup[pos])
+
+      return(
+        <EndPointModel
+          onClick={(index, k) => this.setState({ lookup: [...this.state.lookup, index, k] })}
+          object={responseAtLookup[pos]}
+          summaryMode={true}
+          isArray
+          perceivedArrPos={pos}
+        />
+      )
     }
 
-    return JSON.stringify(responseAtLookup);
+    return(
+        <EndPointModel
+                onClick={(k) => this.setState({ lookup: [...this.state.lookup, k] })}
+                object={responseAtLookup}
+                perceivedArrPos={perceivedArrPos}
+        />
+      )
   }
 
   renderKeyButtons = () => {
     const { responseObj, lookup, arrIndex } = this.state;
-
-    const l = lookup.length;
 
     if(!responseObj) { return }
 
     const objectAtLookup = getAtLookup(lookup, responseObj)
 
     if(Array.isArray(objectAtLookup)) {
+      const pos = this.calcPerceivedArrPos(objectAtLookup.length);
       return (
         <KeyButton
           isArray
+          pos={pos}
           onForward={() => this.setState({arrIndex: arrIndex + 1})}
           onBack={() => this.setState({arrIndex: arrIndex - 1})}
         />
       )
+    }
+
+    if(typeof objectAtLookup === 'string') {
+      console.log('is string')
+      return
     }
 
     return Object.keys(objectAtLookup).map((k) => {
@@ -100,13 +120,9 @@ class APIInspector extends Component {
   }
 
   calcPerceivedArrPos = (length) => {
-    console.log(length)
     const { arrPercentagePos } = this.state;
-    console.log('arrPercentagePos', arrPercentagePos)
     const segSize = 100 / length;
-    console.log('segSize', segSize)
     const perceivedArrPos = Math.floor(arrPercentagePos / segSize);
-    console.log('perceivedArrPos', perceivedArrPos)
     return perceivedArrPos;
   }
 
@@ -128,8 +144,48 @@ class APIInspector extends Component {
     })
   }
 
+  renderErrors = () => {
+    const { errors } = this.state;
+
+    if(!errors) { return }
+
+    return (
+      <div className='error-container'>
+        <h2>Errors</h2>
+        {JSON.stringify(errors)}
+
+      </div>
+    )
+  }
+
+  renderLookUp = () => {
+    const { lookup, responseObj } = this.state;
+
+    let indexBracket = '';
+
+    if(!lookup || !responseObj) { return }
+
+    const objectAtLookup = getAtLookup(lookup, responseObj);
+
+    if (Array.isArray(objectAtLookup)) {
+      indexBracket = `[${this.calcPerceivedArrPos(objectAtLookup.length)}]`
+    }
+
+    const breadcrumbs = lookup.map((lu) => {
+      return (
+        <div
+          onClick={() => this.setState({lookup: lookup.slice(0, lookup.indexOf(lu))})}
+        >
+          {lu}.
+        </div>
+      )
+    })
+
+    return [...breadcrumbs, indexBracket];
+  }
+
   render() {
-    const { lookup, arrPercentagePos } = this.state;
+    const { lookup } = this.state;
 
     const lkupln = lookup.length
 
@@ -146,13 +202,8 @@ class APIInspector extends Component {
               />
               <input
                 placeholder='lookup'
-                value={this.state.lookup}
+                value={this.state.lookupVal}
                 onChange={(e) => this.setState({lookupVal: e.target.value.split('.')}) }
-              />
-              <input
-                placeholder='if array is found, run this map'
-                value={this.state.mapperFunc}
-                onChange={(e) => this.setState({mapperFunc: e.target.value}) }
               />
               <button type='submit' >Fetch</button>
             </form>
@@ -163,13 +214,21 @@ class APIInspector extends Component {
             <div className='response-inspector'>
 
               <div className='response-inspector-key-container'>
-                {lkupln > 0 ? <button onClick={() => this.setState({lookup: lookup.slice(0, lkupln-1)})}>^</button> : ''}
-                {this.renderKeyButtons()}
-                {this.renderArrayHoverNav()}
+                <div>
+                  <div className='lookup-container'>
+                    {lkupln > 0 ? <button onClick={() => this.setState({lookup: lookup.slice(0, lkupln-1)})}>^</button> : ''}
+                    {this.renderLookUp()}
+                  </div>
+                </div>
+                <div>
+                  <div className='hover-nav-container'>
+                    {this.renderArrayHoverNav()}
+                  </div>
+                </div>
               </div>
               <div className='response-inspector-body-container'>
                 {this.renderResponseAtLookup()}
-                {this.state.errors ? JSON.stringify(this.state.errors) : ''}
+                {this.renderErrors()}
               </div>
             </div>
           </div>

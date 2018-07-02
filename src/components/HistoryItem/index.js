@@ -4,7 +4,7 @@ import './style.css';
 class HistoryItem extends Component {
 
   render() {
-    const { data: { uri, lookup }, style, onClick } = this.props;
+    const { data: { uri }, style } = this.props;
 
     return(
       <div className='history-item' style={style} >

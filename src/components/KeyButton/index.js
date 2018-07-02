@@ -7,30 +7,36 @@ class KeyButton extends Component {
     indexShowing: false
   }
 
-  renderArrayNav = () => {
-    const { isArray, indexShowing, arrIndex, onForward, onBack } = this.props;
-
-    if(!isArray) { return }
-
-    return (
-      <div className='array-index-nav'>
-        <span onClick={onBack}>{"<"}</span>
-          {indexShowing ? arrIndex : 'i'}
-        <span onClick={onForward}>{">"}</span>
-      </div>
-    )
-  }
 
   render() {
-    const { data, onClick, isArray } = this.props;
+    const {
+      data,
+      onClick,
+      resourceName,
+      calcWidth,
+      calcHeight,
+      delay,
+      summaryMode
+    } = this.props;
+
 
     return (
       <div
         className='key-button'
         onClick={onClick}
+        style={
+          {
+            width: calcWidth,
+            height: calcHeight,
+            animationDelay: `${delay}s`,
+            animationDuration: '0.5s',
+            animationName: 'fadein',
+            cursor: summaryMode ? 'auto': ''
+          }
+        }
       >
-        {data}
-        {this.renderArrayNav()}
+        {summaryMode ? JSON.stringify(data): resourceName}
+        {/*{this.renderArrayNav()}*/}
       </div>
     )
   }

@@ -1,0 +1,30 @@
+.resource-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.resource-summary-item {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  max-height: 40px;
+}
+
+
+.stringify-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+  width: auto;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.type-container {
+  display: flex;
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  color: rgba(48, 205, 201, 1);
+  border-radius: 4px;
+}

@@ -4,11 +4,17 @@
   align-items: center;
 }
 
+.api-inspector-form-section {
+  background: rgba(250, 250, 250, 0.6);
+  padding: 10px;
+}
+
 .api-inspector-form-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: transparent;
 }
 
 .api-inspector-form {
@@ -43,15 +49,15 @@
 }
 
 .response-inspector-container {
-  height: 400px;
-  width: 500px;
-  background: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  background: transparent;
   padding: 10px;
 }
 
 .response-inspector {
-  width: 100%;
-  height: 100%;
+
+
   background: white;
 }
 
@@ -85,9 +91,19 @@
   height: 40px;
   padding: 5px;
   display: flex;
+  flex-direction: column;
+}
+
+.lookup-container {
+  display: flex;
 }
 
 .response-inspector-body-container {
-  height: 80%;
+  height: 400px;
+  width: 500px;
   overflow-y: auto;
+}
+
+.hover-nav-container {
+
 }

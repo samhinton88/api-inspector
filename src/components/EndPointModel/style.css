@@ -1,0 +1,43 @@
+.end-point-model {
+  height: 100%;
+  widows: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.end-point-model-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  background: orange;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  color: white;
+  transition: 0.5s;
+}
+
+.end-point-model-item:hover {
+  background: white;
+  color: orange;
+}
+
+.model-item-key {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: pink;
+  width: 100%;
+  height: 40px;
+  font-size: 12px;
+  padding: 5px;
+
+}
+
+.model-item-val {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

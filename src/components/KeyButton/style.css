@@ -1,22 +1,28 @@
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
 .key-button {
   height: 30px;
-  background: white;
-  border: 1px solid rgba(10, 200, 10, 1);
+  background: orange;
   display: flex;
   padding: 5px;
   justify-content: center;
   align-items: center;
-  color: rgba(10, 10, 10, 0.7);
+  color: white;
   margin-right: 2px;
   margin-left: 2px;
   border-radius: 3px;
   transition: 0.5s;
   cursor: pointer;
+  animation-fill-mode: both;
 }
 
 .key-button:hover {
-  background: rgba(10, 200, 10, 1);
-  color: white;
+  background: white;
+  color: orange;
 }
 
 .array-index-nav {
